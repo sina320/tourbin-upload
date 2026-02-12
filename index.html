@@ -10,22 +10,61 @@
         .container { max-width: 560px; width: 100%; background: white; border-radius: 28px; box-shadow: 0 8px 30px rgba(0,0,0,0.03); padding: 32px; }
         h1 { font-size: 22px; font-weight: 500; color: #0a2c3d; margin-bottom: 4px; letter-spacing: -0.3px; }
         .sub { color: #5b6f7c; font-size: 13px; margin-bottom: 32px; font-weight: 400; }
-        .upload-area { border: 1.5px dashed #d0d9e0; background: #fafcfc; border-radius: 20px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.15s; margin-bottom: 24px; }
+        
+        /* Upload Area - Drag & Drop */
+        .upload-area { 
+            border: 1.5px dashed #d0d9e0; 
+            background: #fafcfc; 
+            border-radius: 20px; 
+            padding: 36px 20px; 
+            text-align: center; 
+            cursor: pointer; 
+            transition: all 0.15s; 
+            margin-bottom: 24px;
+            position: relative;
+        }
         .upload-area:hover { border-color: #0a7c71; background: #f3f9f8; }
-        .upload-icon { font-size: 28px; margin-bottom: 12px; color: #3e5a63; }
+        .upload-area.dragover { 
+            border-color: #0a7c71; 
+            background: #e8f3f1; 
+            border-width: 2px;
+        }
+        .upload-icon { font-size: 32px; margin-bottom: 12px; color: #3e5a63; }
         .upload-text { font-size: 15px; font-weight: 500; color: #1a2e36; }
         .upload-hint { color: #6f828c; font-size: 13px; margin-top: 8px; }
         .file-name { font-size: 13px; color: #0a7c71; margin-top: 12px; font-weight: 500; }
         input[type=file] { display: none; }
+        
         .row { display: flex; gap: 12px; margin-bottom: 24px; align-items: flex-end; }
         .field { flex: 1; }
         .field-label { font-size: 12px; color: #4f646f; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
         .date-input, .tag-select { width: 100%; padding: 12px 14px; border: 1px solid #e0e8ed; border-radius: 14px; font-size: 14px; background: white; }
         .tag-select { background: white; color: #1a2e36; }
-        .btn { width: 100%; background: #0a7c71; color: white; border: none; padding: 14px; border-radius: 40px; font-size: 15px; font-weight: 500; cursor: pointer; transition: 0.1s; border: 1px solid #0a7c71; }
+        
+        .btn { 
+            width: 100%; 
+            background: #0a7c71; 
+            color: white; 
+            border: none; 
+            padding: 14px; 
+            border-radius: 40px; 
+            font-size: 15px; 
+            font-weight: 500; 
+            cursor: pointer; 
+            transition: 0.1s; 
+            border: 1px solid #0a7c71; 
+        }
         .btn:hover { background: #0e665c; }
         .btn:disabled { background: #b6cdca; border-color: #b6cdca; cursor: not-allowed; }
-        .summary { margin-top: 28px; padding: 20px; background: #f7fafc; border-radius: 18px; border: 1px solid #eaf0f4; display: none; }
+        
+        .summary { 
+            margin-top: 28px; 
+            padding: 20px; 
+            background: #f7fafc; 
+            border-radius: 18px; 
+            border: 1px solid #eaf0f4; 
+            display: none; 
+        }
         .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
         .summary-label { color: #4f646f; }
         .summary-value { font-weight: 500; color: #0a2c3d; }
@@ -38,10 +77,10 @@
         <h1>TORBIN</h1>
         <div class="sub">Data ingestion · Firestore</div>
 
-        <!-- Upload Area -->
+        <!-- Upload Area - Drag & Drop -->
         <div class="upload-area" id="uploadBox">
             <div class="upload-icon">📂</div>
-            <div class="upload-text">Choose Excel file</div>
+            <div class="upload-text">Choose Excel file or drag it here</div>
             <div class="upload-hint">.xlsx only</div>
             <div class="file-name" id="fileName"></div>
         </div>
@@ -66,7 +105,7 @@
         <!-- Upload Button -->
         <button class="btn" id="uploadBtn">Upload to Firestore</button>
 
-        <!-- Summary (shown after upload) -->
+        <!-- Summary -->
         <div class="summary" id="uploadSummary">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
                 <span style="font-weight: 600; color: #0a2c3d;">Summary</span>
@@ -91,7 +130,7 @@
         </div>
 
         <div class="footer">
-            TORBIN · Auto-backup daily 23:00 · Version 1.0
+            TORBIN · Auto-backup daily 23:00 · Version 2.0
         </div>
     </div>
 
@@ -105,10 +144,10 @@
     <script>
         // ============================================
         // TORBIN - Data Ingestion Gateway
-        // Firebase Configuration & Firestore Upload
+        // with Drag & Drop Support
         // ============================================
 
-        // ---------- 1. Firebase Configuration ----------
+        // ---------- Firebase Config ----------
         const firebaseConfig = {
             apiKey: "AIzaSyDGomc7oZCGf8QkQq3I_SJht7GJF6pz_5c",
             authDomain: "tourbin-sales-dashboard-v2.firebaseapp.com",
@@ -122,7 +161,7 @@
         const app = firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore(app);
 
-        // ---------- 2. DOM Elements ----------
+        // ---------- DOM Elements ----------
         const elements = {
             fileInput: document.getElementById('fileInput'),
             uploadBox: document.getElementById('uploadBox'),
@@ -137,52 +176,97 @@
             summaryNewDup: document.getElementById('summaryNewDup')
         };
 
-        // ---------- 3. Set Default Date (Today) ----------
+        // ---------- Set Default Date ----------
         const today = new Date();
         const y = today.getFullYear();
         const m = String(today.getMonth() + 1).padStart(2, '0');
         const d = String(today.getDate()).padStart(2, '0');
         elements.reportDate.value = `${y}-${m}-${d}`;
 
-        // ---------- 4. File Upload Handlers ----------
-        // Click on upload box triggers file input
+        // ============================================
+        // DRAG & DROP HANDLERS
+        // ============================================
+
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            elements.uploadBox.addEventListener(eventName, preventDefaults, false);
+            document.body.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drop area
+        ['dragenter', 'dragover'].forEach(eventName => {
+            elements.uploadBox.addEventListener(eventName, () => {
+                elements.uploadBox.classList.add('dragover');
+            });
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            elements.uploadBox.addEventListener(eventName, () => {
+                elements.uploadBox.classList.remove('dragover');
+            });
+        });
+
+        // Handle dropped files
+        elements.uploadBox.addEventListener('drop', handleDrop, false);
+
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            
+            if (files.length > 0) {
+                elements.fileInput.files = files;
+                updateFileName(files[0].name);
+            }
+        }
+
+        // ---------- File Input Handlers ----------
         elements.uploadBox.addEventListener('click', () => elements.fileInput.click());
 
-        // Show selected file name
         elements.fileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
-                elements.fileName.textContent = this.files[0].name;
+                updateFileName(this.files[0].name);
             } else {
-                elements.fileName.textContent = '';
+                updateFileName('');
             }
         });
 
-        // ---------- 5. Main Upload Function ----------
+        function updateFileName(name) {
+            if (name) {
+                elements.fileName.textContent = name;
+            } else {
+                elements.fileName.textContent = '';
+            }
+        }
+
+        // ============================================
+        // EXCEL UPLOAD & FIRESTORE
+        // ============================================
+
         elements.uploadBtn.addEventListener('click', async function() {
-            // Validate file selection
             if (!elements.fileInput.files.length) {
                 alert('Please select a file');
                 return;
             }
 
-            // Disable button during upload
             elements.uploadBtn.disabled = true;
             elements.uploadBtn.textContent = 'Reading file...';
 
             try {
-                // Read Excel file
                 const file = elements.fileInput.files[0];
                 const data = await file.arrayBuffer();
                 const workbook = XLSX.read(data);
                 const firstSheet = workbook.SheetNames[0];
                 const worksheet = workbook.Sheets[firstSheet];
                 
-                // Convert to JSON
                 const jsonData = XLSX.utils.sheet_to_json(worksheet);
                 
                 elements.uploadBtn.textContent = `Uploading ${jsonData.length} records...`;
                 
-                // Statistics
                 let newCount = 0;
                 let duplicateCount = 0;
                 let errorCount = 0;
@@ -190,10 +274,10 @@
                 // Process each row
                 for (const row of jsonData) {
                     try {
-                        // Check for duplicate using Cart confirmation code
                         const cartCode = row['Cart confirmation code'];
                         if (!cartCode) continue;
 
+                        // Check for duplicates
                         const existing = await db.collection('sales_transactions')
                             .where('cart_confirmation_code', '==', cartCode)
                             .get();
@@ -203,7 +287,7 @@
                             continue;
                         }
 
-                        // Extract agent name (Booking Agent or Affiliate)
+                        // Extract agent name
                         let agentName = '';
                         if (row['Booking Agent'] && row['Booking Agent'] !== '') {
                             agentName = row['Booking Agent'];
@@ -211,7 +295,7 @@
                             agentName = row['Affiliate'];
                         }
 
-                        // Determine sales channel
+                        // Determine channel
                         let channel = 'Unknown';
                         const bookingChannel = row['Booking channel'] || '';
                         
@@ -239,7 +323,7 @@
                             totalPax = paxMatch ? parseInt(paxMatch[0]) : 1;
                         }
 
-                        // Parse price and commission (USD)
+                        // Parse price and commission
                         let priceUSD = 0;
                         if (row['Total price with discount']) {
                             priceUSD = parseFloat(row['Total price with discount']) || 0;
@@ -250,7 +334,7 @@
                             commissionUSD = parseFloat(row['Commission']) || 0;
                         }
 
-                        // Add document to Firestore
+                        // Add to Firestore
                         await db.collection('sales_transactions').add({
                             cart_confirmation_code: cartCode,
                             product_confirmation_code: row['Product confirmation code'] || '',
@@ -278,7 +362,7 @@
                     }
                 }
 
-                // ---------- 6. Display Summary ----------
+                // Show summary
                 elements.summaryFile.textContent = file.name;
                 elements.summaryDate.textContent = elements.reportDate.value;
                 elements.summaryRecords.textContent = jsonData.length;
@@ -295,7 +379,6 @@
                 alert('Upload failed: ' + error.message);
             }
 
-            // Re-enable button
             elements.uploadBtn.disabled = false;
             elements.uploadBtn.textContent = 'Upload to Firestore';
         });
