@@ -1,61 +1,97 @@
 <!DOCTYPE html>
-<html lang="fa" dir="rtl">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>توربین | آپلود گزارش فروش</title>
+    <title>TORBIN · Data Ingestion</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif; }
-        body { background: #f5f7fb; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
-        .container { max-width: 600px; width: 100%; background: white; border-radius: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); padding: 40px; }
-        h1 { font-size: 24px; font-weight: 600; color: #0a2c3d; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
-        .lang-toggle { background: #f0f3f7; border: none; padding: 6px 12px; border-radius: 30px; font-size: 14px; cursor: pointer; margin-right: auto; }
-        .subtitle { color: #5e6f7d; font-size: 15px; margin-bottom: 32px; }
-        .upload-box { border: 2px dashed #cbd5e1; background: #fafcfc; border-radius: 20px; padding: 40px 20px; text-align: center; transition: all 0.2s; cursor: pointer; margin-bottom: 24px; }
-        .upload-box:hover { border-color: #0a7c71; background: #f0f9f8; }
-        .upload-icon { font-size: 32px; margin-bottom: 12px; }
-        .file-name { font-size: 14px; color: #0a7c71; margin-top: 12px; font-weight: 500; }
-        .date-section { background: #f8fafc; border-radius: 16px; padding: 20px; margin-bottom: 24px; }
-        .date-label { display: block; font-size: 14px; color: #3a4c5c; margin-bottom: 8px; font-weight: 500; }
-        input[type=date] { width: 100%; padding: 14px 16px; border: 1px solid #e2e8f0; border-radius: 14px; font-size: 15px; background: white; }
-        .btn { width: 100%; background: #0a7c71; color: white; border: none; padding: 16px; border-radius: 40px; font-size: 16px; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 8px; }
-        .btn:hover { background: #0b635a; }
-        .btn:disabled { background: #b3cfcb; cursor: not-allowed; }
-        .status { margin-top: 24px; padding: 16px; border-radius: 14px; font-size: 14px; display: none; }
-        .status.success { background: #e6f7ed; color: #0b4f3a; display: block; border-right: 4px solid #0a7c71; }
-        .status.error { background: #fee9e7; color: #7f2d2a; display: block; border-right: 4px solid #c24141; }
-        .footer { margin-top: 32px; color: #8b9aa8; font-size: 12px; text-align: center; border-top: 1px solid #ecf1f5; padding-top: 24px; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; }
+        body { background: #f5f7fa; display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .container { max-width: 560px; width: 100%; background: white; border-radius: 28px; box-shadow: 0 8px 30px rgba(0,0,0,0.03); padding: 32px; }
+        h1 { font-size: 22px; font-weight: 500; color: #0a2c3d; margin-bottom: 4px; letter-spacing: -0.3px; }
+        .sub { color: #5b6f7c; font-size: 13px; margin-bottom: 32px; font-weight: 400; }
+        .upload-area { border: 1.5px dashed #d0d9e0; background: #fafcfc; border-radius: 20px; padding: 36px 20px; text-align: center; cursor: pointer; transition: all 0.15s; margin-bottom: 24px; }
+        .upload-area:hover { border-color: #0a7c71; background: #f3f9f8; }
+        .upload-icon { font-size: 28px; margin-bottom: 12px; color: #3e5a63; }
+        .upload-text { font-size: 15px; font-weight: 500; color: #1a2e36; }
+        .upload-hint { color: #6f828c; font-size: 13px; margin-top: 8px; }
+        .file-name { font-size: 13px; color: #0a7c71; margin-top: 12px; font-weight: 500; }
+        input[type=file] { display: none; }
+        .row { display: flex; gap: 12px; margin-bottom: 24px; align-items: flex-end; }
+        .field { flex: 1; }
+        .field-label { font-size: 12px; color: #4f646f; margin-bottom: 6px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+        .date-input, .tag-select { width: 100%; padding: 12px 14px; border: 1px solid #e0e8ed; border-radius: 14px; font-size: 14px; background: white; }
+        .tag-select { background: white; color: #1a2e36; }
+        .btn { width: 100%; background: #0a7c71; color: white; border: none; padding: 14px; border-radius: 40px; font-size: 15px; font-weight: 500; cursor: pointer; transition: 0.1s; border: 1px solid #0a7c71; }
+        .btn:hover { background: #0e665c; }
+        .btn:disabled { background: #b6cdca; border-color: #b6cdca; cursor: not-allowed; }
+        .summary { margin-top: 28px; padding: 20px; background: #f7fafc; border-radius: 18px; border: 1px solid #eaf0f4; display: none; }
+        .summary-item { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; }
+        .summary-label { color: #4f646f; }
+        .summary-value { font-weight: 500; color: #0a2c3d; }
+        .badge { background: #e2f0ee; color: #0a7c71; padding: 4px 10px; border-radius: 50px; font-size: 12px; display: inline-block; }
+        .footer { margin-top: 28px; color: #8c9ca5; font-size: 11px; text-align: center; border-top: 1px solid #ecf1f5; padding-top: 24px; }
     </style>
 </head>
 <body>
-    <div class="container" id="app">
-        <div style="display: flex; align-items: center; justify-content: space-between;">
-            <h1>
-                <span>📊</span> توربین
-            </h1>
-            <button class="lang-toggle" id="langToggle">English</button>
-        </div>
-        <div class="subtitle" id="subtitle">
-            آپلود گزارش فروش ماهانه • اضافه خودکار به دیتابیس
-        </div>
+    <div class="container">
+        <h1>TORBIN</h1>
+        <div class="sub">Data ingestion · Firestore</div>
 
-        <div class="upload-box" id="uploadBox">
-            <div class="upload-icon">📁</div>
-            <div id="uploadText" style="font-weight: 500; color: #1e2f3b;">گزارش ماهانه را انتخاب کنید</div>
-            <div style="color: #6f7e8b; font-size: 13px; margin-top: 8px;">.xlsx یا .xls</div>
+        <!-- Upload -->
+        <div class="upload-area" id="uploadBox">
+            <div class="upload-icon">📂</div>
+            <div class="upload-text">Choose Excel file</div>
+            <div class="upload-hint">.xlsx only</div>
             <div class="file-name" id="fileName"></div>
         </div>
-        <input type="file" id="fileInput" accept=".xlsx, .xls" style="display: none;">
+        <input type="file" id="fileInput" accept=".xlsx">
 
-        <div class="date-section">
-            <span class="date-label" id="dateLabel">📆 ماه/سال گزارش</span>
-            <input type="date" id="reportDate">
+        <!-- Date + Tag -->
+        <div class="row">
+            <div class="field">
+                <div class="field-label">📆 Date</div>
+                <input type="date" class="date-input" id="reportDate">
+            </div>
+            <div class="field">
+                <div class="field-label">🏷️ Type</div>
+                <select class="tag-select" id="reportTag">
+                    <option value="daily">Daily</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="correction">Correction</option>
+                </select>
+            </div>
         </div>
 
-        <button class="btn" id="uploadBtn">🚀 آپلود و افزودن به دیتابیس</button>
-        <div id="statusMessage" class="status"></div>
+        <!-- Upload button -->
+        <button class="btn" id="uploadBtn">Upload to Firestore</button>
+
+        <!-- Summary (shown after upload) -->
+        <div class="summary" id="uploadSummary">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                <span style="font-weight: 600; color: #0a2c3d;">Summary</span>
+                <span class="badge">Appended</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">File</span>
+                <span class="summary-value" id="summaryFile">—</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Report date</span>
+                <span class="summary-value" id="summaryDate">—</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">Records</span>
+                <span class="summary-value" id="summaryRecords">—</span>
+            </div>
+            <div class="summary-item">
+                <span class="summary-label">New / Duplicate</span>
+                <span class="summary-value" id="summaryNewDup">—</span>
+            </div>
+        </div>
+
         <div class="footer">
-            TORBIN • فروش مستقیم • OTA • Agent • نسخه ۱.۰
+            TORBIN · Auto-backup daily 23:00 · Version 1.0
         </div>
     </div>
 
@@ -64,95 +100,56 @@
         const uploadBox = document.getElementById('uploadBox');
         const fileName = document.getElementById('fileName');
         const uploadBtn = document.getElementById('uploadBtn');
-        const statusMsg = document.getElementById('statusMessage');
         const reportDate = document.getElementById('reportDate');
-        const langToggle = document.getElementById('langToggle');
+        const reportTag = document.getElementById('reportTag');
+        const summary = document.getElementById('uploadSummary');
 
+        // Set today as default date
         const today = new Date();
-        const year = today.getFullYear();
-        const month = String(today.getMonth() + 1).padStart(2, '0');
-        const day = String(today.getDate()).padStart(2, '0');
-        reportDate.value = `${year}-${month}-${day}`;
+        const y = today.getFullYear();
+        const m = String(today.getMonth() + 1).padStart(2, '0');
+        const d = String(today.getDate()).padStart(2, '0');
+        reportDate.value = `${y}-${m}-${d}`;
 
-        let currentLang = 'fa';
-        const translations = {
-            fa: {
-                title: 'توربین',
-                subtitle: 'آپلود گزارش فروش ماهانه • اضافه خودکار به دیتابیس',
-                uploadText: 'گزارش ماهانه را انتخاب کنید',
-                dateLabel: '📆 ماه/سال گزارش',
-                uploadBtn: '🚀 آپلود و افزودن به دیتابیس',
-                success: '✅ آپلود موفق: {added} رکورد جدید اضافه شد، {duplicated} تکراری',
-                error: '❌ خطا: فایل را بررسی کنید',
-                noFile: 'لطفاً فایل را انتخاب کنید',
-                noDate: 'لطفاً تاریخ گزارش را وارد کنید',
-                langEn: 'English',
-                langFa: 'فارسی'
-            },
-            en: {
-                title: 'TORBIN',
-                subtitle: 'Monthly Sales Report • Auto-append to Database',
-                uploadText: 'Choose monthly report file',
-                dateLabel: '📆 Report Month/Year',
-                uploadBtn: '🚀 Upload & Append to Database',
-                success: '✅ Success: {added} new records, {duplicated} duplicates',
-                error: '❌ Error: Please check the file',
-                noFile: 'Please select a file',
-                noDate: 'Please enter report date',
-                langEn: 'English',
-                langFa: 'Persian'
-            }
-        };
-
-        function setLanguage(lang) {
-            currentLang = lang;
-            document.querySelector('h1 span').nextSibling.textContent = translations[lang].title;
-            document.getElementById('subtitle').innerText = translations[lang].subtitle;
-            document.getElementById('uploadText').innerText = translations[lang].uploadText;
-            document.getElementById('dateLabel').innerText = translations[lang].dateLabel;
-            uploadBtn.innerText = translations[lang].uploadBtn;
-            langToggle.innerText = lang === 'fa' ? translations.fa.langEn : translations.en.langFa;
-            document.dir = lang === 'fa' ? 'rtl' : 'ltr';
-        }
-
-        langToggle.addEventListener('click', () => {
-            setLanguage(currentLang === 'fa' ? 'en' : 'fa');
-        });
-
+        // Trigger file input
         uploadBox.addEventListener('click', () => fileInput.click());
 
-        fileInput.addEventListener('change', function(e) {
+        // Show selected file name
+        fileInput.addEventListener('change', function() {
             if (this.files.length > 0) {
-                fileName.innerText = this.files[0].name;
+                fileName.textContent = this.files[0].name;
             } else {
-                fileName.innerText = '';
+                fileName.textContent = '';
             }
         });
 
+        // Mock upload
         uploadBtn.addEventListener('click', async function() {
             if (!fileInput.files.length) {
-                statusMsg.className = 'status error';
-                statusMsg.innerText = currentLang === 'fa' ? translations.fa.noFile : translations.en.noFile;
-                return;
-            }
-            if (!reportDate.value) {
-                statusMsg.className = 'status error';
-                statusMsg.innerText = currentLang === 'fa' ? translations.fa.noDate : translations.en.noDate;
+                alert('Please select a file');
                 return;
             }
 
             uploadBtn.disabled = true;
-            uploadBtn.innerText = currentLang === 'fa' ? '⏳ در حال آپلود...' : '⏳ Uploading...';
+            uploadBtn.textContent = 'Uploading...';
 
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            await new Promise(resolve => setTimeout(resolve, 1600));
 
-            statusMsg.className = 'status success';
-            statusMsg.innerText = currentLang === 'fa' 
-                ? '✅ آپلود موفق: ۱۲۸ رکورد جدید اضافه شد، ۳ تکراری'
-                : '✅ Success: 128 new records, 3 duplicates';
+            // Fill summary
+            const file = fileInput.files[0];
+            const recordCount = Math.floor(Math.random() * 60) + 25;
+            const newRecords = Math.floor(recordCount * 0.92);
+            const dup = recordCount - newRecords;
+
+            document.getElementById('summaryFile').textContent = file.name;
+            document.getElementById('summaryDate').textContent = reportDate.value;
+            document.getElementById('summaryRecords').textContent = recordCount;
+            document.getElementById('summaryNewDup').textContent = `${newRecords} / ${dup}`;
+
+            summary.style.display = 'block';
 
             uploadBtn.disabled = false;
-            uploadBtn.innerText = currentLang === 'fa' ? translations.fa.uploadBtn : translations.en.uploadBtn;
+            uploadBtn.textContent = 'Upload to Firestore';
         });
     </script>
 </body>
