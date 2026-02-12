@@ -152,5 +152,24 @@
             uploadBtn.textContent = 'Upload to Firestore';
         });
     </script>
+
+        <!-- Firebase SDKs - اضافه شده -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyDGomc7oZCGf8QkQq3I_SJht7GJF6pz_5c",
+        authDomain: "tourbin-sales-dashboard-v2.firebaseapp.com",
+        projectId: "tourbin-sales-dashboard-v2",
+        storageBucket: "tourbin-sales-dashboard-v2.firebasestorage.app",
+        messagingSenderId: "827092290582",
+        appId: "1:827092290582:web:24e530b12858c615d13937"
+      };
+
+      const app = firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore(app);
+    </script>
+</body>
 </body>
 </html>
